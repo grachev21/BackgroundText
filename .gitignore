@@ -1,0 +1,63 @@
+# Игнорируем зависимости
+node_modules/
+**/node_modules/
+
+# Игнорируем собранные файлы
+dist/
+out/
+release/
+build/
+*.exe
+*.dmg
+*.deb
+*.snap
+*.app
+*.zip
+
+# Игнорируем кэш и временные файлы
+.cache/
+.temp/
+.tmp/
+*.tmp
+*.bak
+*.swp
+*~
+
+# Игнорируем логи
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Игнорируем настройки IDE и редакторов
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Игнорируем системные файлы
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Игнорируем файлы окружения
+.env
+.env.local
+.env.development
+.env.production
+
+# Игнорируем специфичные для Electron файлы
+electron-builder.env
+app/package.json  # если у вас двухпакетная структура (root package.json и app/package.json)
+
+# Игнорируем тестовые покрытия
+coverage/
+.nyc_output/
+
+# Игнорируем автоматически генерируемые файлы
+package-lock.json
+yarn.lock
