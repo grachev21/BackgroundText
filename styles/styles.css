@@ -22,6 +22,8 @@ main {
 .element-container {
   display: flex;
   flex-wrap: wrap;
+  padding-left: 1rem;
+  padding-right: 1rem;
 
   .post-pair {
     position: relative;
@@ -29,6 +31,7 @@ main {
     margin: 1px;
     padding-left: 14px;
     padding-right: 8px;
+    cursor: pointer;
 
     .po {
       color: var(--textPo-color);
@@ -51,43 +54,63 @@ main {
   transform: translate(-50%, -50%);
 }
 
-.content-form {
+footer {
   position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  background-color: var(--background-color);
-
+  left: 0;
+  bottom: 0;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   flex-direction: row;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
 
-  .form-group {
-    margin-right: 1rem;
+  .content-form {
+    background-color: var(--background-color);
+    display: flex;
+    align-items: center;
+    flex-direction: row;
 
-    input {
-      background-color: var(--input-color);
-      color: var(--textInput-color);
-      border: 1px solid var(--border-color);
-      padding: 4px;
-      font-size: 14px;
+    .form-group {
+      margin-right: 1rem;
+
+      input {
+        background-color: var(--input-color);
+        color: var(--textInput-color);
+        border: 1px solid var(--border-color);
+        padding: 4px;
+        font-size: 14px;
+      }
+
+      input::placeholder {
+        color: var(--textInput-color);
+        opacity: 60%;
+      }
     }
-
-    input::placeholder {
-      color: var(--textInput-color);
-      opacity: 60%;
+    button {
+      color: var(--textButton-color);
+      background-color: var(--button-color);
+      border: none;
+      height: 100%;
+      padding: 6px;
+      padding-right: 8px;
+      padding-left: 8px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
     }
   }
-  button {
-    color: var(--textButton-color);
-    background-color: var(--button-color);
-    /* border: 1px solid var(--border-color); */
-    border: none;
-    height: 100%;
-    padding: 6px;
-    padding-right: 8px;
-    padding-left: 8px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: bold;
+  .hideMeaning {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    label {
+      color: var(--textMe-color);
+      margin-left: 0.4rem;
+      text-align: start;
+      margin-bottom: 1px;
+    }
   }
 }
