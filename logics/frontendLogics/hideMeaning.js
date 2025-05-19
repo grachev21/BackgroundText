@@ -15,7 +15,6 @@ const hideMeaning = () => {
 
   if (checkbox) {
     checkbox.addEventListener("change", handleCheckboxChange);
-
     handleCheckboxChange.call(checkbox);
   }
 };
