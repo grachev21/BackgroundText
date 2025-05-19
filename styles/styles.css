@@ -1,7 +1,7 @@
 :root {
   --background-color: black;
-  --textEn-color: rgb(29, 229, 206);
-  --textRu-color: rgb(242, 90, 125);
+  --textPo-color: rgb(29, 229, 206);
+  --textMe-color: rgb(242, 90, 125);
   --button-color: rgb(28, 171, 107);
   --textButton-color: rgb(221, 221, 221);
   --textInput-color: rgb(0, 249, 241);
@@ -23,23 +23,23 @@ main {
   display: flex;
   flex-wrap: wrap;
 
-  .word-pair {
+  .post-pair {
     position: relative;
     display: flex;
     margin: 1px;
     padding-left: 14px;
     padding-right: 8px;
 
-    .en {
-      color: var(--textEn-color);
+    .po {
+      color: var(--textPo-color);
     }
-    .ru {
-      color: var(--textRu-color);
+    .me {
+      color: var(--textMe-color);
       margin-left: 0.4rem;
     }
   }
 }
-.word-pair::before {
+.post-pair::before {
   position: absolute;
   content: "";
   background-color: var(--dot-color);
