@@ -76,19 +76,26 @@ function modalWindow() {
   if (listPosts) {
     const html = /*html*/ `
       <div class="modal-window">
-        <span class="del">Удалить</span>
-        <span class="meaning">номер</span>
+        <span class="number"></span>
+        <span class="meaning"></span>
+        <span class="delete">Удалить</span>
       </div>
 `;
-    listPosts.forEach((listPosts) => {
-      listPosts.insertAdjacentHTML("afterbegin", html);
-      listPosts.addEventListener("mouseenter", () => {
-        let element = listPosts.querySelector(".modal-window");
+    listPosts.forEach((item, index) => {
+      item.insertAdjacentHTML("afterbegin", html);
+      item.querySelector(".number").textContent = index + 1;
+      item.querySelector(".meaning").textContent = item.querySelector(".me").textContent;
+      item.addEventListener("mouseover", () => {
+        item.style.border = "1px solid white";
+        let element = item.querySelector(".modal-window");
         element.style.opacity = "100%";
+        element.style.zIndex = "50";
       });
-      listPosts.addEventListener("mouseleave", () => {
-        let element = listPosts.querySelector(".modal-window");
+      item.addEventListener("mouseout", () => {
+        item.style.border = "1px solid var(--background-color)";
+        let element = item.querySelector(".modal-window");
         element.style.opacity = "0%";
+        element.style.zIndex = "-50";
       });
     });
   }
