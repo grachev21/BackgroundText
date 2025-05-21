@@ -69,6 +69,11 @@ main {
       }
       .delete {
         color: var(--textMe-color);
+        transition: 0.3s;
+      }
+      .delete:hover {
+        color: rgb(255, 225, 165);
+        border-bottom: 1px solid yellow;
       }
     }
   }
@@ -131,6 +136,13 @@ footer {
       border-radius: 10px;
       font-size: 14px;
       font-weight: bold;
+    }
+    #message {
+      color: var(--textButton-color);
+      font-weight: bold;
+      position: absolute;
+      left: 1rem;
+      top: -2rem;
     }
   }
   .hideMeaning {

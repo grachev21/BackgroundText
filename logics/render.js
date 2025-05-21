@@ -1,134 +1,145 @@
 const checkbox = document.getElementById("hideMeaning");
 const listContainer = document.getElementById("element-container");
 
-// DOWNLOADING POSTS FROM THE LOCAL JSON FILE
-function loadPost() {
-  fetch("./post.json")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Ошибка загрузки файла");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      renderList(data);
-    })
-    .catch((error) => {
-      console.error("Произошла ошибка:", error);
-    });
-
-  function renderList(items) {
-    // Clean the container before adding new elements
-    listContainer.innerHTML = "";
-
-    items.forEach((item) => {
-      const postPair = document.createElement("div");
-      postPair.className = "post-pair";
-
-      const poPost = document.createElement("p");
-      poPost.className = "po";
-      poPost.textContent = item.po;
-
-      const mePost = document.createElement("p");
-      mePost.className = "me";
-      mePost.textContent = item.me;
-      postPair.appendChild(poPost);
-      postPair.appendChild(mePost);
-      listContainer.appendChild(postPair);
-    });
-
-    // Call pop -up windows since you need to wait until the functions are completed
-    quiantityPost();
-    modalWindow();
-  }
+// *** FUNCTION FOR DISPLAYING MESSAGES ***
+function showMessage(text, color = "green") {
+  const messageEl = document.getElementById("message");
+  messageEl.textContent = text;
+  setTimeout(() => (messageEl.textContent = ""), 3000);
 }
 
-// DISPLAY OF THE NUMBER OF POSTS
+// *** READING JSON FILE ***
+async function readJson() {
+  const data = await window.electronAPI.readJson();
+  listContainer.innerHTML = "";
+  data.forEach((item) => {
+    const postPair = document.createElement("div");
+    postPair.className = "post-pair";
+
+    const poPost = document.createElement("p");
+    poPost.className = "po";
+    poPost.textContent = item.po;
+
+    const mePost = document.createElement("p");
+    mePost.className = "me";
+    mePost.textContent = item.me;
+    postPair.appendChild(poPost);
+    postPair.appendChild(mePost);
+    listContainer.appendChild(postPair);
+  });
+  quiantityPost();
+  modalWindow();
+  setupDeleteHandlers();
+}
+
+// *** DISPLAY OF THE NUMBER OF POSTS ***
 function quiantityPost() {
-  let listPosts = document.querySelectorAll(".post-pair");
-  let quantity = document.getElementById("quantity");
+  const listPosts = document.querySelectorAll(".post-pair");
+  const quantity = document.getElementById("quantity");
   quantity.textContent = listPosts.length;
 }
 
-// HIDE THE MEANING
+// *** HIDING OF THE VALUES ***
 function hideMeaning() {
+  if (!checkbox) return;
   const handleCheckboxChange = function () {
-    if (this.checked) {
-      document.querySelectorAll(".post-pair > .me").forEach((element) => {
-        element.style.display = "none";
-      });
-    } else {
-      document.querySelectorAll(".post-pair > .me").forEach((element) => {
-        element.style.display = "block";
-      });
-    }
-  };
-
-  if (checkbox) {
-    checkbox.addEventListener("change", handleCheckboxChange);
-    handleCheckboxChange.call(checkbox);
-  }
-}
-
-// DISPLAYS A WINDOW WITH INFORMATION ABOUT THE POST AND THE DELETE BUTTON
-function modalWindow() {
-  let listPosts = document.querySelectorAll(".post-pair");
-  if (listPosts) {
-    const html = /*html*/ `
-      <div class="modal-window">
-        <span class="number"></span>
-        <span class="meaning"></span>
-        <span class="delete">Удалить</span>
-      </div>
-`;
-    listPosts.forEach((item, index) => {
-      item.insertAdjacentHTML("afterbegin", html);
-      item.querySelector(".number").textContent = index + 1;
-      item.querySelector(".meaning").textContent = item.querySelector(".me").textContent;
-      item.addEventListener("mouseover", () => {
-        item.style.border = "1px solid white";
-        let element = item.querySelector(".modal-window");
-        element.style.opacity = "100%";
-        element.style.zIndex = "50";
-      });
-      item.addEventListener("mouseout", () => {
-        item.style.border = "1px solid var(--background-color)";
-        let element = item.querySelector(".modal-window");
-        element.style.opacity = "0%";
-        element.style.zIndex = "-50";
-      });
+    const display = this.checked ? "none" : "block";
+    document.querySelectorAll(".post-pair > .me").forEach((element) => {
+      element.style.display = display;
     });
-  }
+  };
+  checkbox.addEventListener("change", handleCheckboxChange);
+  handleCheckboxChange.call(checkbox);
 }
 
-// ADDING A NEW POST
-function inputPost() {
+// *** MODAL WINDOW FOR POSTS ***
+function modalWindow() {
+  const listPosts = document.querySelectorAll(".post-pair");
+  if (!listPosts.length) return;
+
+  const html = /*html*/ `
+    <div class="modal-window">
+      <span class="number"></span>
+      <span class="meaning"></span>
+      <span class="delete">Удалить</span>
+    </div>
+  `;
+
+  listPosts.forEach((item, index) => {
+    item.insertAdjacentHTML("afterbegin", html);
+    item.querySelector(".number").textContent = index + 1;
+    item.querySelector(".meaning").textContent = item.querySelector(".me").textContent;
+
+    item.addEventListener("mouseover", () => {
+      item.style.border = "1px solid white";
+      const element = item.querySelector(".modal-window");
+      element.style.opacity = "100%";
+      element.style.zIndex = "50";
+    });
+
+    item.addEventListener("mouseout", () => {
+      item.style.border = "1px solid var(--background-color)";
+      const element = item.querySelector(".modal-window");
+      element.style.opacity = "0%";
+      element.style.zIndex = "-50";
+    });
+  });
+}
+
+// *** REMOVAL OF POSTS ***
+function setupDeleteHandlers() {
+  const deleteButtons = document.querySelectorAll(".delete");
+  console.log(deleteButtons);
+
+  deleteButtons.forEach((button, index) => {
+    button.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      try {
+        const success = await window.electronAPI.deletePost(index);
+        if (success) {
+          showMessage("Пост успешно удален!");
+          readJson();
+        } else {
+          throw new Error("Не удалось удалить пост");
+        }
+      } catch (error) {
+        console.error("Ошибка удаления:", error);
+        showMessage(`Ошибка удаления: ${error.message}`, "red");
+      }
+    });
+  });
+}
+
+// ДОБАВЛЕНИЕ НОВОГО ПОСТА
+function addPost() {
   document.getElementById("addPost").addEventListener("click", async () => {
     const poPost = document.getElementById("poPost").value.trim();
     const mePost = document.getElementById("mePost").value.trim();
-    const messageEl = document.getElementById("message");
 
     if (!poPost || !mePost) {
-      messageEl.textContent = "Оба поля должны быть заполнены!";
-      messageEl.style.color = "red";
+      showMessage("Оба поля должны быть заполнены!", "red");
       return;
     }
     try {
-      // send data to the Main process
       await window.electronAPI.addPost({ po: poPost, me: mePost });
-      messageEl.textContent = "Слово успешно добавлено!";
-      messageEl.style.color = "green";
+      showMessage("Слово успешно добавлено!");
 
-      // Cleanse input fields
+      readJson();
+
       document.getElementById("poPost").value = "";
       document.getElementById("mePost").value = "";
     } catch (error) {
-      messageEl.textContent = "Ошибка при добавлении слова: " + error.message;
-      messageEl.style.color = "red";
+      console.error("Ошибка добавления:", error);
+      showMessage(`Ошибка при добавлении слова: ${error.message}`, "red");
     }
   });
 }
 
-inputPost();
-loadPost();
-hideMeaning();
+// ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+function init() {
+  readJson();
+  addPost();
+  hideMeaning();
+}
+
+init();

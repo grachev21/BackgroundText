@@ -1,35 +1,75 @@
 const { app, BrowserWindow, Menu, ipcMain } = require("electron");
 const path = require("path");
+const fs = require("fs/promises");
+const os = require("os");
 
-const fs = require("fs");
+// The path to the file
+// const postPath = path.join(app.getPath('userData'), 'post.json');
+const postPath = path.join(os.homedir(), 'Documents', 'post.json');
 
-// Путь к JSON-файлу
-const postPath = path.join("./post.json");
-
-// Создаем файл если его нет
-if (!fs.existsSync(postPath)) {
-  fs.writeFileSync(postPath, JSON.stringify([]));
+// Initialization File
+async function initializePostsFile() {
+  try {
+    await fs.access(postPath);
+  } catch {
+    await fs.writeFile(postPath, JSON.stringify([]));
+  }
 }
 
-// Обработчик для добавления слова
-ipcMain.handle("addPost", async (event, newPost) => {
+// *** POST READER ***
+ipcMain.handle("readJson", async () => {
   try {
-    // Читаем текущие данные
-    const data = JSON.parse(fs.readFileSync(postPath, "utf-8"));
-
-    // Добавляем новое слово
-    data.push(newPost);
-
-    // Записываем обратно
-    fs.writeFileSync(postPath, JSON.stringify(data, null, 2));
-
-    return { success: true };
+    const data = await fs.readFile(postPath, "utf-8")
+    return JSON.parse(data);
   } catch (error) {
-    throw new Error("Не удалось сохранить слово");
+    console.error("Error reading JSON file:", error)
+    throw error;
   }
 });
 
-// Автоперезагрузка при изменении файлов
+// *** PROCESSOR ADDING POST ***
+ipcMain.handle("addPost", async (event, newPost) => {
+  try {
+    await initializePostsFile();
+    const data = await fs.readFile(postPath, 'utf-8');
+    const posts = JSON.parse(data);
+    // Checking the structure of the new post
+    if (!newPost.po || !newPost.me) {
+      throw new Error("Некорректная структура поста");
+    }
+    posts.push(newPost);
+    await fs.writeFile(postPath, JSON.stringify(posts, null, 2));
+    return { success: true };
+  } catch (error) {
+    console.error('Add post error:', error);
+    throw new Error(`Ошибка при добавлении: ${error.message}`);
+  }
+});
+
+// *** LAST REMOVAL HANDLER ***
+ipcMain.handle('deletePost', async (event, index) => {
+  try {
+    await initializePostsFile();
+
+    const data = await fs.readFile(postPath, 'utf-8');
+    const posts = JSON.parse(data);
+    console.log(posts, data)
+
+    if (index < 0 || index >= posts.length) {
+      console.error(`Invalid index: ${index}, posts length: ${posts.length}`);
+      return false;
+    }
+
+    posts.splice(index, 1);
+    await fs.writeFile(postPath, JSON.stringify(posts, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Delete post error:', error);
+    throw new Error(`Ошибка при удалении: ${error.message}`);
+  }
+});
+
+// AUTO RE -PROCUREMENT
 require("electron-reload")(__dirname, {
   electron: path.join(__dirname, "node_modules", ".bin", "electron"),
   hardResetMethod: "exit",
@@ -40,7 +80,6 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true,
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
@@ -48,12 +87,13 @@ function createWindow() {
   });
 
   Menu.setApplicationMenu(null);
-
   win.loadFile("index.html");
-  win.webContents.openDevTools(); // Раскомментируйте для отладки
+  win.webContents.openDevTools();
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  initializePostsFile().then(createWindow);
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
