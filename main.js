@@ -5,7 +5,7 @@ const os = require("os");
 
 // The path to the file
 // const postPath = path.join(app.getPath('userData'), 'post.json');
-const postPath = path.join(os.homedir(), 'Documents', 'post.json');
+const postPath = path.join(os.homedir(), "Documents", "post.json");
 
 // Initialization File
 async function initializePostsFile() {
@@ -19,10 +19,10 @@ async function initializePostsFile() {
 // *** POST READER ***
 ipcMain.handle("readJson", async () => {
   try {
-    const data = await fs.readFile(postPath, "utf-8")
+    const data = await fs.readFile(postPath, "utf-8");
     return JSON.parse(data);
   } catch (error) {
-    console.error("Error reading JSON file:", error)
+    console.error("Error reading JSON file:", error);
     throw error;
   }
 });
@@ -31,7 +31,7 @@ ipcMain.handle("readJson", async () => {
 ipcMain.handle("addPost", async (event, newPost) => {
   try {
     await initializePostsFile();
-    const data = await fs.readFile(postPath, 'utf-8');
+    const data = await fs.readFile(postPath, "utf-8");
     const posts = JSON.parse(data);
     // Checking the structure of the new post
     if (!newPost.po || !newPost.me) {
@@ -41,19 +41,19 @@ ipcMain.handle("addPost", async (event, newPost) => {
     await fs.writeFile(postPath, JSON.stringify(posts, null, 2));
     return { success: true };
   } catch (error) {
-    console.error('Add post error:', error);
+    console.error("Add post error:", error);
     throw new Error(`Ошибка при добавлении: ${error.message}`);
   }
 });
 
 // *** LAST REMOVAL HANDLER ***
-ipcMain.handle('deletePost', async (event, index) => {
+ipcMain.handle("deletePost", async (event, index) => {
   try {
     await initializePostsFile();
 
-    const data = await fs.readFile(postPath, 'utf-8');
+    const data = await fs.readFile(postPath, "utf-8");
     const posts = JSON.parse(data);
-    console.log(posts, data)
+    console.log(posts, data);
 
     if (index < 0 || index >= posts.length) {
       console.error(`Invalid index: ${index}, posts length: ${posts.length}`);
@@ -64,7 +64,7 @@ ipcMain.handle('deletePost', async (event, index) => {
     await fs.writeFile(postPath, JSON.stringify(posts, null, 2));
     return true;
   } catch (error) {
-    console.error('Delete post error:', error);
+    console.error("Delete post error:", error);
     throw new Error(`Ошибка при удалении: ${error.message}`);
   }
 });
@@ -75,20 +75,31 @@ require("electron-reload")(__dirname, {
   hardResetMethod: "exit",
 });
 
+// Добавьте это перед созданием окна
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1920,
+    height: 1080,
+    x: 0,
+    y: 0,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: false,
+    skipTaskbar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
-      nodeIntegration: false,
+      nodeIntegration: true,
     },
   });
 
-  Menu.setApplicationMenu(null);
   win.loadFile("index.html");
-  win.webContents.openDevTools();
+
+  // Трюк, чтобы окно стало позади всех
+  win.setAlwaysOnTop(true, "screen-saver");
+  win.setVisibleOnAllWorkspaces(true);
+  win.showInactive(); // показать, не фокусируя
+  // win.setAlwaysOnTop(false); // снять поверх
 }
 
 app.whenReady().then(() => {
