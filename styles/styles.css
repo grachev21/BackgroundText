@@ -109,8 +109,10 @@ footer {
     display: flex;
     align-items: center;
     flex-direction: row;
+    width: 100%;
 
     .form-group {
+      display: flex;
       margin-right: 1rem;
 
       input {
@@ -119,6 +121,16 @@ footer {
         border: 1px solid var(--border-color);
         padding: 4px;
         font-size: 14px;
+      }
+      #mePost {
+        /* position: relative; */
+        background-color: var(--input-color);
+        color: var(--textInput-color);
+        border: 1px solid var(--border-color);
+        padding: 4px;
+        font-size: 14px;
+        width: 20rem;
+        margin-right: 1rem;
       }
 
       input::placeholder {
@@ -160,6 +172,7 @@ footer {
   .quantity {
     display: flex;
     flex-direction: row-reverse;
+    margin-left: 1rem;
     p {
       color: var(--textMe-color);
       margin-left: 0.4rem;

@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs/promises");
 const os = require("os");
+const axios = require("axios");
 
 // The path to the file
 // const postPath = path.join(app.getPath('userData'), 'post.json');
@@ -23,6 +24,17 @@ ipcMain.handle("readJson", async () => {
     return JSON.parse(data);
   } catch (error) {
     console.error("Error reading JSON file:", error);
+    throw error;
+  }
+});
+
+// *** CHECK POST JSON FILE ***
+ipcMain.handle("checkPost", async () => {
+  try {
+    const data = await fs.readFile("./post.json", "utf-8");
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("It was not possible to read the data", error);
     throw error;
   }
 });
@@ -87,12 +99,13 @@ function createWindow() {
     alwaysOnTop: false,
     skipTaskbar: true,
     webPreferences: {
+      devTools: true,
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: true,
     },
   });
-
+  win.webContents.openDevTools();
   win.loadFile("index.html");
 
   // Трюк, чтобы окно стало позади всех

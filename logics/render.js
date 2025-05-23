@@ -110,12 +110,46 @@ function setupDeleteHandlers() {
   });
 }
 
-// ДОБАВЛЕНИЕ НОВОГО ПОСТА
+async function checkPost() {
+  let mePost = document.getElementById("mePost");
+  document.getElementById("poPost").addEventListener("input", async (event) => {
+    // console.log("Текущее значение:", event.target.value);
+    const data = await window.electronAPI.checkPost();
+
+    const value = data.find((item) => item.post === event.target.value);
+    if (value != undefined) {
+      mePost.textContent = value["meaning"];
+    } else {
+      mePost.textContent = "";
+    }
+    if (event.target.value.length === 0) {
+      mePost.textContent = "";
+    }
+    // data.forEach((value) => {
+    // data.map((value) => {
+    //   const foundKey = Object.keys(value).find((key) => value[key] === event.target.value);
+    //   if (foundKey != undefined) {
+    //     mePost.textContent = value["meaning"];
+    //   }
+    //   // if (foundKey == undefined) {
+    //   //   mePost.textContent = "xxx";
+    //   // }
+    // });
+  });
+
+  // poPost.document.addEventListener("change", () => {
+  //   // console.log("message");
+  //   // console.log(await window.electronAPI.checkPost());
+  // });
+}
+
+// ADDING A NEW POST
 function addPost() {
   document.getElementById("addPost").addEventListener("click", async () => {
     const poPost = document.getElementById("poPost").value.trim();
     const mePost = document.getElementById("mePost").value.trim();
 
+    console.log(poPost);
     if (!poPost || !mePost) {
       showMessage("Оба поля должны быть заполнены!", "red");
       return;
@@ -140,6 +174,7 @@ function init() {
   readJson();
   addPost();
   hideMeaning();
+  checkPost();
 }
 
 init();
