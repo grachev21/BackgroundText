@@ -1,19 +1,40 @@
 {
-  "name": "backgroundinfo",
+  "name": "backgroundtext",
+  "build": {
+    "appId": "com.example.app",
+    "productName": "backgroundtext",
+    "linux": {
+      "target": ["AppImage", "deb"]
+    },
+   "files": [
+      "main.js",
+      "index.html",
+      "preload.js",
+      "render.js",
+      "styles.css",
+      "post.json",
+      "icons/**/*"
+    ]
+  },
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-builder"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Ivan Grachev",
+    "email": "ivan@example.com"
+  },
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
     "@eslint/js": "^9.27.0",
     "electron": "^36.2.1",
+    "electron-builder": "^26.0.12",
     "electron-reload": "^2.0.0-alpha.1",
     "globals": "^16.1.0"
   },

@@ -68,7 +68,8 @@ function modalWindow() {
   listPosts.forEach((item, index) => {
     item.insertAdjacentHTML("afterbegin", html);
     item.querySelector(".number").textContent = index + 1;
-    item.querySelector(".meaning").textContent = item.querySelector(".me").textContent;
+    item.querySelector(".meaning").textContent =
+      item.querySelector(".me").textContent;
 
     item.addEventListener("mouseover", () => {
       item.style.border = "1px solid white";
@@ -113,7 +114,9 @@ function setupDeleteHandlers() {
 async function checkPost() {
   let mePost = document.getElementById("mePost");
   document.getElementById("poPost").addEventListener("input", async (event) => {
-    // console.log("Текущее значение:", event.target.value);
+    if (event.target.value.length === 0) {
+      mePost.textContent = "";
+    }
     const data = await window.electronAPI.checkPost();
 
     const value = data.find((item) => item.post === event.target.value);
@@ -122,32 +125,14 @@ async function checkPost() {
     } else {
       mePost.textContent = "";
     }
-    if (event.target.value.length === 0) {
-      mePost.textContent = "";
-    }
-    // data.forEach((value) => {
-    // data.map((value) => {
-    //   const foundKey = Object.keys(value).find((key) => value[key] === event.target.value);
-    //   if (foundKey != undefined) {
-    //     mePost.textContent = value["meaning"];
-    //   }
-    //   // if (foundKey == undefined) {
-    //   //   mePost.textContent = "xxx";
-    //   // }
-    // });
   });
-
-  // poPost.document.addEventListener("change", () => {
-  //   // console.log("message");
-  //   // console.log(await window.electronAPI.checkPost());
-  // });
 }
 
 // ADDING A NEW POST
 function addPost() {
   document.getElementById("addPost").addEventListener("click", async () => {
     const poPost = document.getElementById("poPost").value.trim();
-    const mePost = document.getElementById("mePost").value.trim();
+    const mePost = document.getElementById("mePost").textContent;
 
     console.log(poPost);
     if (!poPost || !mePost) {
@@ -157,6 +142,7 @@ function addPost() {
     try {
       await window.electronAPI.addPost({ po: poPost, me: mePost });
       showMessage("Слово успешно добавлено!");
+      document.getElementById("mePost").textContent = "";
 
       readJson();
 
@@ -169,12 +155,19 @@ function addPost() {
   });
 }
 
+const quitApp = () => {
+  document.getElementById("quit-app").addEventListener("click", () => {
+    window.electronAPI.quitApp();
+  });
+};
+
 // ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
 function init() {
   readJson();
   addPost();
   hideMeaning();
   checkPost();
+  quitApp();
 }
 
 init();

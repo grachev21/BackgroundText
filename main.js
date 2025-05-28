@@ -1,8 +1,7 @@
-const { app, BrowserWindow, Menu, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs/promises");
 const os = require("os");
-const axios = require("axios");
 
 // The path to the file
 // const postPath = path.join(app.getPath('userData'), 'post.json');
@@ -29,9 +28,10 @@ ipcMain.handle("readJson", async () => {
 });
 
 // *** CHECK POST JSON FILE ***
+const postPathRead = path.join(__dirname, "post.json");
 ipcMain.handle("checkPost", async () => {
   try {
-    const data = await fs.readFile("./post.json", "utf-8");
+    const data = await fs.readFile(postPathRead, "utf-8");
     return JSON.parse(data);
   } catch (error) {
     console.error("It was not possible to read the data", error);
@@ -81,11 +81,15 @@ ipcMain.handle("deletePost", async (event, index) => {
   }
 });
 
-// AUTO RE -PROCUREMENT
-require("electron-reload")(__dirname, {
-  electron: path.join(__dirname, "node_modules", ".bin", "electron"),
-  hardResetMethod: "exit",
+ipcMain.on("quit-app", () => {
+  app.quit();
 });
+
+// AUTO RE -PROCUREMENT
+// require("electron-reload")(__dirname, {
+//   electron: path.join(__dirname, "node_modules", ".bin", "electron"),
+//   hardResetMethod: "exit",
+// });
 
 // Добавьте это перед созданием окна
 function createWindow() {
@@ -95,24 +99,24 @@ function createWindow() {
     x: 0,
     y: 0,
     frame: false,
-    transparent: true,
     alwaysOnTop: false,
     skipTaskbar: true,
+    show: true,
+    icon: path.join(__dirname, "icons", "icon.png"), // или .ico на Windows
     webPreferences: {
-      devTools: true,
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
-      nodeIntegration: true,
+      nodeIntegration: false,
     },
   });
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
   win.loadFile("index.html");
 
   // Трюк, чтобы окно стало позади всех
   win.setAlwaysOnTop(true, "screen-saver");
   win.setVisibleOnAllWorkspaces(true);
   win.showInactive(); // показать, не фокусируя
-  // win.setAlwaysOnTop(false); // снять поверх
+  win.setAlwaysOnTop(false); // снять поверх
 }
 
 app.whenReady().then(() => {
