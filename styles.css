@@ -135,7 +135,7 @@ main {
     .me {
       color: var(--textMe-color);
       margin-left: 0.4rem;
-      border-radius: 12px;
+      /* border-radius: 12px; */
       transition: 1s;
     }
 
@@ -149,7 +149,7 @@ main {
       top: 1.8rem;
       left: 1rem;
       z-index: -50;
-      border-radius: 10px;
+      /* border-radius: 10px; */
       opacity: 0%;
 
       span {
@@ -324,4 +324,27 @@ footer {
   opacity: 100%;
   width: 2rem;
   height: 2rem;
+}
+
+.alphabetPointer {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  p {
+    color: var(--textInput-color);
+    cursor: pointer;
+    padding: 0.4rem;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  p:hover {
+    color: white;
+  }
+}
+
+.pointerWord {
+  background-color: var(--button-color);
+  transition: all 0.3s;
 }

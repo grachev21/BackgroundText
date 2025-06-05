@@ -31,6 +31,7 @@ async function readJson() {
   quiantityPost();
   modalWindow();
   setupDeleteHandlers();
+  alphabetPointer();
 }
 
 // *** DISPLAY OF THE NUMBER OF POSTS ***
@@ -154,6 +155,8 @@ function addPost() {
         const word = Array.from(elements).find((el) => el.textContent.includes(poPost));
         word.setAttribute("style", "border: 1px, solid red; border-radius: 12px;");
         setTimeout(() => word.removeAttribute("style"), 3000);
+        document.getElementById("poPost").value = "";
+        document.getElementById("mePost").textContent = "";
       }
     } catch (error) {
       console.error("Ошибка добавления:", error);
@@ -161,6 +164,28 @@ function addPost() {
     }
   });
 }
+
+const alphabetPointer = () => {
+  const alphabet = document.querySelectorAll(".alphabetPointer > p");
+  const allWords = document.querySelectorAll(".post-pair > .po");
+
+  alphabet.forEach((item) => {
+    item.addEventListener("mouseover", (e) => {
+      allWords.forEach((item) => {
+        if (item.textContent[0] === e.target.textContent) {
+          item.classList.add("pointerWord");
+        }
+      });
+    });
+    item.addEventListener("mouseout", (e) => {
+      allWords.forEach((item) => {
+        if (item.textContent[0] === e.target.textContent) {
+          item.classList.remove("pointerWord");
+        }
+      });
+    });
+  });
+};
 
 const quitApp = () => {
   document.getElementById("quit-app").addEventListener("click", () => {
