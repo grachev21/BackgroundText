@@ -4,15 +4,16 @@ const listContainer = document.getElementById("element-container");
 // *** FUNCTION FOR DISPLAYING MESSAGES ***
 function showMessage(text, color = "green") {
   const messageEl = document.getElementById("message");
+  messageEl.setAttribute("style", `color: ${color}`);
   messageEl.textContent = text;
   setTimeout(() => (messageEl.textContent = ""), 3000);
 }
 
 // *** READING JSON FILE ***
 async function readJson() {
-  const data = await window.electronAPI.readJson();
+  const globalData = await window.electronAPI.readJson();
   listContainer.innerHTML = "";
-  data.forEach((item) => {
+  globalData.forEach((item) => {
     const postPair = document.createElement("div");
     postPair.className = "post-pair";
 
@@ -43,9 +44,9 @@ function quiantityPost() {
 function hideMeaning() {
   if (!checkbox) return;
   const handleCheckboxChange = function () {
-    const display = this.checked ? "none" : "block";
+    const display = this.checked ? "rgb(242, 90, 125)" : "";
     document.querySelectorAll(".post-pair > .me").forEach((element) => {
-      element.style.display = display;
+      element.style.backgroundColor = display;
     });
   };
   checkbox.addEventListener("change", handleCheckboxChange);
@@ -68,8 +69,7 @@ function modalWindow() {
   listPosts.forEach((item, index) => {
     item.insertAdjacentHTML("afterbegin", html);
     item.querySelector(".number").textContent = index + 1;
-    item.querySelector(".meaning").textContent =
-      item.querySelector(".me").textContent;
+    item.querySelector(".meaning").textContent = item.querySelector(".me").textContent;
 
     item.addEventListener("mouseover", () => {
       item.style.border = "1px solid white";
@@ -90,7 +90,6 @@ function modalWindow() {
 // *** REMOVAL OF POSTS ***
 function setupDeleteHandlers() {
   const deleteButtons = document.querySelectorAll(".delete");
-  console.log(deleteButtons);
 
   deleteButtons.forEach((button, index) => {
     button.addEventListener("click", async (e) => {
@@ -134,20 +133,28 @@ function addPost() {
     const poPost = document.getElementById("poPost").value.trim();
     const mePost = document.getElementById("mePost").textContent;
 
-    console.log(poPost);
     if (!poPost || !mePost) {
-      showMessage("Оба поля должны быть заполнены!", "red");
+      showMessage("Поле должно быть заполнено!", "red");
       return;
     }
+
     try {
-      await window.electronAPI.addPost({ po: poPost, me: mePost });
-      showMessage("Слово успешно добавлено!");
-      document.getElementById("mePost").textContent = "";
-
-      readJson();
-
-      document.getElementById("poPost").value = "";
-      document.getElementById("mePost").value = "";
+      const allPosts = await window.electronAPI.readJson();
+      const result = allPosts.find((p) => p.po === poPost);
+      if (result === undefined) {
+        await window.electronAPI.addPost({ po: poPost, me: mePost });
+        showMessage("Слово успешно добавлено!");
+        document.getElementById("mePost").textContent = "";
+        readJson();
+        document.getElementById("poPost").value = "";
+        document.getElementById("mePost").value = "";
+      } else {
+        showMessage("Это слово уже есть в вашем словаре!", "red");
+        const elements = document.querySelectorAll(".post-pair");
+        const word = Array.from(elements).find((el) => el.textContent.includes(poPost));
+        word.setAttribute("style", "border: 1px, solid red; border-radius: 12px;");
+        setTimeout(() => word.removeAttribute("style"), 3000);
+      }
     } catch (error) {
       console.error("Ошибка добавления:", error);
       showMessage(`Ошибка при добавлении слова: ${error.message}`, "red");

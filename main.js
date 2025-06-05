@@ -86,10 +86,10 @@ ipcMain.on("quit-app", () => {
 });
 
 // AUTO RE -PROCUREMENT
-// require("electron-reload")(__dirname, {
-//   electron: path.join(__dirname, "node_modules", ".bin", "electron"),
-//   hardResetMethod: "exit",
-// });
+require("electron-reload")(__dirname, {
+  electron: path.join(__dirname, "node_modules", ".bin", "electron"),
+  hardResetMethod: "exit",
+});
 
 // Добавьте это перед созданием окна
 function createWindow() {
@@ -109,7 +109,7 @@ function createWindow() {
       nodeIntegration: false,
     },
   });
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
   win.loadFile("index.html");
 
   // Трюк, чтобы окно стало позади всех
